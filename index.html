@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#101c25" />
+<meta name="description" content="IGP TRACKER PRO – Fährten, Hunde und Training offline verwalten." />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" href="./icons/icon-192.png" />
+<title>IGP TRACKER PRO</title>
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <div class="brand"><span class="brand-icon">◈</span><div><strong>IGP <span>TRACKER</span> PRO</strong><small>HUNDESPORT · V1.0</small></div></div>
+    <span id="connectionBadge" class="status">● Offline bereit</span>
+  </header>
+  <main class="main">
+    <section id="page-home" class="page active">
+      <div class="eyebrow">DEIN TRAININGSZENTRUM</div><h1>Alles im Blick.</h1><p class="lead">Fährten aufzeichnen, Fortschritte dokumentieren und dein Training organisieren – lokal auf deinem Gerät.</p>
+      <div class="stats"><div class="stat"><strong id="statDogs">0</strong><span>Hunde</span></div><div class="stat"><strong id="statTracks">0</strong><span>Fährten</span></div><div class="stat"><strong id="statTrainings">0</strong><span>Einheiten</span></div></div>
+      <div class="section-title"><h2>Schnellstart</h2></div>
+      <div class="quick-grid"><button data-nav="tracks" class="quick"><span>⌖</span><strong>Neue Fährte</strong><small>GPS-Aufzeichnung</small></button><button data-nav="dogs" class="quick"><span>♧</span><strong>Meine Hunde</strong><small>Profile verwalten</small></button><button data-nav="calendar" class="quick"><span>▦</span><strong>Training</strong><small>Planen & notieren</small></button><button data-nav="data" class="quick"><span>⇩</span><strong>Sicherung</strong><small>Daten exportieren</small></button></div>
+      <div class="panel"><div class="section-title"><h2>Letzte Fährten</h2></div><div id="recentTracks" class="item-list"></div></div>
+      <div class="note">ℹ GPS funktioniert nur mit Standortfreigabe und über HTTPS oder localhost. Bei gesperrtem Bildschirm kann Android die Browser-Aufzeichnung anhalten.</div>
+    </section>
+    <section id="page-tracks" class="page">
+      <div class="eyebrow">ABTEILUNG A</div><h1>Fährtenarbeit</h1><p class="lead">Lege eine GPS-Fährte, setze Gegenstände und Winkel und zeichne anschließend die Absuche auf.</p>
+      <div id="gpsNotice" class="notice">Standort noch nicht aktiviert.</div>
+      <div class="panel recording-panel">
+        <div class="fields"><label>Hund<select id="trackDog"></select></label><label>Fährtenname<input id="trackName" placeholder="z. B. Acker Nord" maxlength="80" /></label></div>
+        <div class="fields"><label>Aufzeichnung<select id="trackMode"><option value="lay">Fährte legen</option><option value="search">Fährte absuchen</option></select></label><label id="existingTrackField" class="hidden">Gespeicherte Fährte<select id="existingTrack"></select></label></div>
+        <div class="record-stats"><div><span>ZEIT</span><strong id="liveTime">00:00</strong></div><div><span>STRECKE</span><strong id="liveDistance">0 m</strong></div><div><span>GPS-GENAUIGKEIT</span><strong id="liveAccuracy">–</strong></div><div><span>PUNKTE</span><strong id="livePoints">0</strong></div></div>
+        <div id="mapPanel" class="map-panel"><canvas id="trackCanvas" aria-label="GPS-Spurenkarte"></canvas><div class="map-overlay"><span id="mapLabel">Noch keine GPS-Spur</span><div><button id="zoomIn" aria-label="Karte vergrößern">+</button><button id="zoomOut" aria-label="Karte verkleinern">−</button><button id="zoomReset" aria-label="Karte zentrieren">⌖</button></div></div></div>
+        <p class="map-hint">Die Karte zeichnet GPS-Koordinaten maßstabsgetreu. Offline bleibt die Spur sichtbar, auch ohne Straßenkarte. Zwei Finger zum Verschieben sind nicht erforderlich; Karte mit einem Finger ziehen.</p>
+        <div class="buttons"><button id="startTrack" class="primary">● Aufzeichnung starten</button><button id="pauseTrack" class="secondary" disabled>Pause</button><button id="finishTrack" class="danger" disabled>Speichern & beenden</button></div>
+        <div class="buttons"><button id="markCorner" class="secondary" disabled>⌁ Winkel setzen</button><button id="markObject" class="secondary" disabled>◆ Gegenstand setzen</button></div>
+        <div id="recorderStatus" class="muted">Bereit für die nächste Fährte.</div>
+      </div>
+      <div class="section-title"><h2>Gespeicherte Fährten</h2></div><div id="trackList" class="item-list"></div>
+    </section>
+    <section id="page-dogs" class="page">
+      <div class="eyebrow">DEIN TEAM</div><h1>Meine Hunde</h1><p class="lead">Profile und Trainingsnotizen deiner Sporthunde verwalten.</p>
+      <form id="dogForm" class="panel"><input type="hidden" id="dogId" /><div class="fields"><label>Name *<input required maxlength="60" id="dogName" placeholder="Name des Hundes" /></label><label>Rasse<input maxlength="60" id="dogBreed" placeholder="z. B. Dobermann" /></label></div><div class="fields"><label>Geburtsdatum<input type="date" id="dogBirthday" /></label><label>Ausbildungsstand<select id="dogLevel"><option value="Junghund">Junghund</option><option value="Aufbau">Aufbau</option><option value="BH/VT">BH/VT</option><option value="IGP 1">IGP 1</option><option value="IGP 2">IGP 2</option><option value="IGP 3">IGP 3</option><option value="IFH">IFH</option></select></label></div><label>Notizen<textarea id="dogNotes" maxlength="1000" rows="2" placeholder="Schwerpunkte, Besonderheiten ..."></textarea></label><div class="buttons"><button type="submit" class="primary" id="dogSave">Hund speichern</button><button type="button" class="secondary" id="dogClear">Zurücksetzen</button></div></form>
+      <div id="dogList" class="item-list"></div>
+    </section>
+    <section id="page-calendar" class="page">
+      <div class="eyebrow">DEINE ROUTINE</div><h1>Trainingskalender</h1><p class="lead">Trainingseinheiten planen, dokumentieren und bewerten.</p>
+      <form id="trainingForm" class="panel"><div class="fields"><label>Datum *<input type="date" required id="trainingDate" /></label><label>Hund *<select required id="trainingDog"></select></label></div><div class="fields"><label>Bereich<select id="trainingType"><option>Unterordnung</option><option>Fährte</option><option>Schutzdienst</option><option>Impulskontrolle</option><option>Alltag</option><option>Sonstiges</option></select></label><label>Bewertung<select id="trainingRating"><option value="">Noch offen</option><option value="1">1 – schwierig</option><option value="2">2 – ausbaufähig</option><option value="3">3 – solide</option><option value="4">4 – gut</option><option value="5">5 – sehr gut</option></select></label></div><label>Inhalt & Ziele<textarea id="trainingNotes" maxlength="2000" rows="3" placeholder="Was wurde geübt? Was ist der nächste Schritt?"></textarea></label><button class="primary" type="submit">+ Training speichern</button></form>
+      <div class="calendar-nav"><button id="prevMonth" class="secondary">‹</button><strong id="monthTitle"></strong><button id="nextMonth" class="secondary">›</button></div><div id="calendarGrid" class="calendar-grid"></div><div class="section-title"><h2 id="calendarSelectionTitle">Einträge</h2></div><div id="trainingList" class="item-list"></div>
+    </section>
+    <section id="page-data" class="page">
+      <div class="eyebrow">DEINE DATEN</div><h1>Speicher & Sicherung</h1><p class="lead">Alle Einträge liegen in der Datenbank dieses Browsers auf diesem Gerät – nicht auf einem fremden Server.</p>
+      <div class="panel"><h2>Datensicherung</h2><p>Exportiere alle Hunde, Fährten und Trainingseinträge als JSON-Datei. Sichere sie regelmäßig außerhalb des Browsers.</p><div class="buttons"><button id="exportData" class="primary">↓ Daten exportieren</button><label class="file-action secondary">↑ Sicherung importieren<input id="importData" type="file" accept="application/json,.json" hidden /></label></div><p class="muted">Import führt Daten anhand ihrer IDs zusammen. Bestehende Einträge mit gleicher ID werden überschrieben.</p></div>
+      <div class="panel"><h2>App installieren</h2><p>Unter Android in Chrome: Menü ⋮ → „App installieren“ oder „Zum Startbildschirm hinzufügen“. Die Installation ist bei Bereitstellung per HTTPS möglich.</p><button id="installApp" class="secondary hidden">App jetzt installieren</button><p id="installStatus" class="muted"></p></div>
+      <div class="panel"><h2>Technische Hinweise</h2><p>Die GPS-Funktion erfordert eine Standortfreigabe und ausreichend Satellitenempfang. Genauigkeit und Abweichungen hängen vom Smartphone und den Umgebungsbedingungen ab. Eine PWA kann bei Bildschirmsperre oder App-Wechsel pausieren; für verlässliche Langzeitaufzeichnungen ist später eine native Android-App erforderlich.</p><p>Die App nutzt keine externen Kartenserver, Benutzerkonten oder Cloud-Dienste. GPS-Tracks werden im lokalen IndexedDB-Speicher abgelegt.</p></div>
+      <div class="panel warning"><h2>Alle Daten löschen</h2><p>Nur verwenden, wenn deine Sicherung bereits gespeichert ist.</p><button id="eraseData" class="danger">Lokale Daten endgültig löschen</button></div>
+      <div class="muted small">IGP TRACKER PRO · Version 1.0 · Eigenständiges Trainingswerkzeug, nicht mit Knurrix verbunden.</div>
+    </section>
+  </main>
+  <nav class="bottom-nav" aria-label="Navigation"><button data-nav="home" class="selected"><span>⌂</span>Start</button><button data-nav="tracks"><span>⌖</span>Fährten</button><button data-nav="dogs"><span>♧</span>Hunde</button><button data-nav="calendar"><span>▦</span>Training</button><button data-nav="data"><span>⚙</span>Daten</button></nav>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="./app.js" defer></script>
+</body>
+</html>
